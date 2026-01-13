@@ -18,11 +18,16 @@ func main() {
 		log.Fatal("Key not set")
 	}
 
-	http.HandleFunc("/api/activities", func(w http.ResponseWriter, r *http.Request) {
+	mux := http.NewServeMux()
+
+	mux.HandleFunc("/api/activities", func(w http.ResponseWriter, r *http.Request) {
 		bungie.LawlessData(w, r, apiKey)
 	})
 
+	fileServer := http.FileServer(http.Dir("./web"))
+	mux.Handle("/", fileServer)
+
 	log.Println("Server is running on port 8080")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Fatal(http.ListenAndServe(":8080", mux))
 
 }
